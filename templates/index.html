@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <style type="text/css">
         header {
@@ -36,6 +37,7 @@
             background-color:wheat;
         }
     </style>
+
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -45,7 +47,7 @@
     
     <header class="padding30">
         <p>Hello! This is <em>highflyer chat</em></p>
-        <img src="../images/blackPigeonLogo.gif" class="logo">
+        <img src="{{url_for('static', filename='blackPigeonLogo.gif')}}" class="logo">
     </header>
 
     <main class="padding30">
@@ -58,7 +60,7 @@
     </section>
 
     <aside class="aside">
-        <a href="https://github.com/aiman-al-masoud/highflyer_chat" target="_blank"> <img src="../images/GitHub-Mark-64px.png" style="width:30px;height:30px;"></a>
+        <a href="https://github.com/aiman-al-masoud/highflyer_chat" target="_blank"> <img src="{{url_for('static', filename='GitHub-Mark-64px.png')}}" style="width:30px;height:30px;"></a>
     </aside>
 
 
