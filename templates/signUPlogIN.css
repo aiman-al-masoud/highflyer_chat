@@ -1,0 +1,17 @@
+body{
+    background: url("../images/blackPigeonLogo.gif"), yellow;
+    background-size: 40%;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+form{
+    padding: 50px;
+    position: fixed;
+    top: 200px;
+    left: 400px;
+}
+.bottomleft{
+    position: fixed;
+    bottom: 10px;
+    left: 500px;
+}
