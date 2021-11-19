@@ -60,7 +60,7 @@ def on_post_login():
         #refresh the last_login_time of the user
         refresh_last_login(username)
 
-        return render_template("user_console.html", current_user=username)
+        return render_template("user_console.html", current_user=username, inbox = get_users_messages(username))
 
 
     return "Wrong username and/or password!"    
@@ -131,10 +131,15 @@ def on_post_send_message():
     mess_time = time()
 
     if send_message(sender, receiver, message, mess_time):
-        return render_template("user_console.html", current_user=sender)
+        return render_template("user_console.html", current_user=sender, inbox = get_users_messages(sender))
 
     return  "Send failed!"
 
+
+# TODO: retrieve sender and timestamp info, not just content, maybe make a Message class
+def get_users_messages(receiver):
+    df = get_messages_table()
+    return df[df.receiver==receiver].message.to_list()
 
 
 
