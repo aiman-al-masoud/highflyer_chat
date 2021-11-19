@@ -3,7 +3,7 @@
 ![blackPigeon](https://user-images.githubusercontent.com/80196658/142221311-9f9c136b-0c93-4241-be09-5fd96fd7dc89.gif)
 
 
-## Instructions to set up a local testing envinronment:
+## Instructions to set up a local testing environment:
 
 
 #### 1) Clone this repository and navigate to its root directory
@@ -13,7 +13,7 @@
 ```
 $ python3 -m venv my_env
 ```
-#### 3) Activate the virtual envinronment:
+#### 3) Activate the virtual environment:
 
 ```
 $ source ./my_env/bin/activate
