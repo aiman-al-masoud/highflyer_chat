@@ -1,5 +1,5 @@
 body{
-    background: url("../images/blackPigeonLogo.gif"), yellow;
+    background: url("{{url_for('static', filename='blackPigeonLogo.gif')}}"), yellow;
     background-size: 40%;
     background-repeat: no-repeat;
     background-position: center;
