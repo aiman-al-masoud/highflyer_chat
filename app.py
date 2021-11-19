@@ -3,6 +3,8 @@
 # imports
 import pandas as pd
 from flask import Flask, render_template, request
+import hashlib
+
 
 # constants
 PASSWORDS_TABLE_PATH = "./data/passwords_table.csv"
@@ -116,12 +118,9 @@ def user_exists(username):
     return (df.username==username).sum() != 0 
 
 
-# TODO: don't use default hashing function, but not this stupid one!
 def hash_password(password):
-    l = [ord(x) for x in list(password)]
-    return sum(l)
-
-
+    h = hashlib.sha1(password.encode("utf-8")).hexdigest()
+    return h
 
 
 
