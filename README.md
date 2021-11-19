@@ -44,7 +44,7 @@ $ source ./my_env/bin/activate
  * Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)
 ```
 
-#### Click on the link, and the main page will be launched on your default browser. Yay!
+#### Click on the link, and the homepage will be launched on your default browser. Yay!
 
 
 
