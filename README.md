@@ -19,7 +19,7 @@ $ python3 -m venv my_env
 $ source ./my_env/bin/activate
 ```
 
-##### (You should notice that the console starts displating the virtual environment's name before your own and the dollar-sign).
+##### (You should notice that the console starts displaying the virtual environment's name before your own name and the dollar-sign).
 
 
 
