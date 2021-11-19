@@ -134,5 +134,7 @@ dmypy.json
 my_env/
 
 #ignore changes to data folder
+./data/
+./data/*
 data/
 data/passwords_table.csv
