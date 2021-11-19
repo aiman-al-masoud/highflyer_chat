@@ -7,7 +7,7 @@ import hashlib
 
 
 # constants
-PASSWORDS_TABLE_PATH = "./data/passwords_table.csv"
+PASSWORDS_TABLE_PATH = "./user_data/passwords_table.csv"
 
 
 # start the app
