@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Console</title>
+</head>
+<body>
+
+    <h1>Welcome back {{current_user}}!</h1>
+
+
+    <form id="send_message_form" action="/post_send_message" method="POST">
+        Recipient:
+        <br>
+        <input type="text" name="receiver"></input>
+        <br>
+        Message:
+        <br>
+        <input type="text" name="message"></input>
+
+
+        <input type="hidden" name="sender" value={{current_user}}></input>
+
+
+        <br>
+        <br><br>
+        <button type="sumbit" >send</button>
+    </form>
+
+
+
+    
+</body>
+</html>
