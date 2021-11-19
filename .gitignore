@@ -132,3 +132,6 @@ dmypy.json
 
 #ignore env folder
 my_env/
+
+#ignore changes to data folder
+data/
