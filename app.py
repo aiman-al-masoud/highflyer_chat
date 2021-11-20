@@ -5,6 +5,7 @@ import pandas as pd
 from flask import Flask, render_template, request
 import hashlib
 from time import time
+import random
 
 
 
@@ -49,6 +50,7 @@ def on_post_login():
     password_attempt = request.form["password"]
 
 
+    #TODO redirect to signup
     # check if username exists
     if not user_exists(username):
         return "You don't have an account yet!"
@@ -60,7 +62,12 @@ def on_post_login():
         #refresh the last_login_time of the user
         refresh_last_login(username)
 
-        return render_template("user_console.html", current_user=username, inbox = get_users_messages(username))
+        # generate a new session id token, set it for the user and send it to the user
+        session_id = generate_session_id()
+
+        set_session_id(username, session_id)
+
+        return render_template("user_console.html", current_user=username, inbox = get_users_messages(username), session_id = session_id)
 
 
     return "Wrong username and/or password!"    
@@ -117,7 +124,7 @@ def get_passwords_table():
 
 
 def create_passwords_table():
-    return pd.DataFrame([], columns=["username", "hashed_password", "last_login_time"])
+    return pd.DataFrame([], columns=["username", "hashed_password", "last_login_time", "session_id"])
 
 
 @app.route("/post_send_message", methods = ["GET", "POST"])
@@ -126,12 +133,22 @@ def on_post_send_message():
     sender = request.form["sender"]
     receiver = request.form["receiver"]
     message =  request.form["message"]
+    session_id = request.form["session_id"]
 
-    #TODO: get time from html document
+    #TODO: get true send time from html document instead
     mess_time = time()
 
+    #get the user's current/last session id
+    current_session_id = get_session_id(sender)
+
+    # TODO: redirect to login page
+    if int(eval(str(session_id) ) )!=int(eval(str(current_session_id))):
+        return "Session id token expired!"
+
+  
+
     if send_message(sender, receiver, message, mess_time):
-        return render_template("user_console.html", current_user=sender, inbox = get_users_messages(sender))
+        return render_template("user_console.html", current_user=sender, inbox = get_users_messages(sender), session_id = get_session_id(sender))
 
     return  "Send failed!"
 
@@ -180,7 +197,7 @@ def send_message(sender, receiver, message, time):
         return 
 
     # TODO: redirect user to login
-    if not user_logged_in(sender):
+    if not session_expired(sender):
         return False
 
     # append new message to table    
@@ -230,7 +247,7 @@ def hash_password(password):
 
 
 # TODO: improve rule to determine if user is logged in
-def user_logged_in(username):
+def session_expired(username):
 
     # in seconds
     last_time = get_last_login(username)
@@ -245,8 +262,25 @@ def user_logged_in(username):
 
 
 
+def generate_session_id():
+    return random.randint(0 , 1000000000)
 
-    
+
+def set_session_id(username, new_session_id):
+
+    df = get_passwords_table()
+    df.loc[df.username == username, 'session_id'] = new_session_id
+    store_passwords_table(df)
+
+
+
+def get_session_id(username):
+    df = get_passwords_table()
+    return df.loc[df.username == username, 'session_id'].to_list()[0]
+
+
+
+
 
 
 
