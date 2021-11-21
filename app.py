@@ -8,7 +8,6 @@ from time import time
 import random
 
 
-
 # constants
 PASSWORDS_TABLE_PATH = "./user_data/passwords_table.csv"
 MESSAGES_TABLE_PATH = "./user_data/messages_table.csv"
@@ -36,9 +35,6 @@ def on_signup():
 
 
 
-
-
-
 @app.route("/post_login", methods = ["POST", "GET"])
 def on_post_login():
 
@@ -57,8 +53,10 @@ def on_post_login():
 
 
     # compare entered password's hash to actual password's hash
-    if df[df.username==username].hashed_password.to_list()[0] == hash_password(password_attempt):
-        
+    #if df[df.username==username].hashed_password.to_list()[0] == hash_password(password_attempt):
+    if get_passhash(username) == hash_password(password_attempt):
+ 
+
         #refresh the last_login_time of the user
         refresh_last_login(username)
 
@@ -67,11 +65,10 @@ def on_post_login():
 
         set_session_id(username, session_id)
 
-        return render_template("user_console.html", current_user=username, inbox = get_users_messages(username), session_id = session_id)
+        return render_template("user_console.html", current_user=username, inbox = get_users_inbox(username), session_id = session_id)
 
 
     return "Wrong username and/or password!"    
-
 
 
 
@@ -95,10 +92,11 @@ def on_post_signup():
     if password != password_confirm:
         return "Looks like a typo! Passwords don't match! Signup aborted."
 
-    # add the user and hashed password to the passwords table    
-    row = pd.DataFrame([(username, hash_password(password), 0)], columns=["username", "hashed_password", "last_login_time"]) 
-    df = df.append(row)
-    store_passwords_table(df)
+    # create a new user:
+    #row = pd.DataFrame([(username, hash_password(password), 0)], columns=["username", "hashed_password", "last_login_time"]) 
+    #df = df.append(row)
+    #store_passwords_table(df)
+    create_user(username, password)
 
     # first login happened NOW
     refresh_last_login(username)
@@ -106,6 +104,61 @@ def on_post_signup():
     # welcome new user
     return f'Welcome {username}!'
 
+
+@app.route("/post_send_message", methods = ["GET", "POST"])
+def on_post_send_message():
+
+    sender = request.form["sender"]
+    receiver = request.form["receiver"]
+    message =  request.form["message"]
+    session_id = request.form["session_id"]
+
+    #TODO: get true send time from html document instead
+    mess_time = time()
+
+    #get the user's current/last session id
+    current_session_id = get_session_id(sender)
+
+    # TODO: redirect to login page
+    if int(eval(str(session_id) ) )!=int(eval(str(current_session_id))):
+        return "Session id token expired!"
+
+    if send_message(sender, receiver, message, mess_time):
+        return render_template("user_console.html", current_user=sender, inbox = get_users_inbox(sender), session_id = get_session_id(sender))
+
+    return  "Send failed!"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+def create_user(username, password):
+    df = get_passwords_table()
+    row = pd.DataFrame([(username, hash_password(password), 0)], columns=["username", "hashed_password", "last_login_time"]) 
+    df = df.append(row)
+    store_passwords_table(df)
+
+
+def get_passhash(username):
+    df = get_passwords_table()
+    return df[df.username==username].hashed_password.to_list()[0]
+
+
+def set_password(username, password):
+    pass
 
 
 
@@ -127,34 +180,9 @@ def create_passwords_table():
     return pd.DataFrame([], columns=["username", "hashed_password", "last_login_time", "session_id"])
 
 
-@app.route("/post_send_message", methods = ["GET", "POST"])
-def on_post_send_message():
-
-    sender = request.form["sender"]
-    receiver = request.form["receiver"]
-    message =  request.form["message"]
-    session_id = request.form["session_id"]
-
-    #TODO: get true send time from html document instead
-    mess_time = time()
-
-    #get the user's current/last session id
-    current_session_id = get_session_id(sender)
-
-    # TODO: redirect to login page
-    if int(eval(str(session_id) ) )!=int(eval(str(current_session_id))):
-        return "Session id token expired!"
-
-  
-
-    if send_message(sender, receiver, message, mess_time):
-        return render_template("user_console.html", current_user=sender, inbox = get_users_messages(sender), session_id = get_session_id(sender))
-
-    return  "Send failed!"
-
 
 # TODO: retrieve sender and timestamp info, not just content, maybe make a Message class
-def get_users_messages(receiver):
+def get_users_inbox(receiver):
     df = get_messages_table()
     return df[df.receiver==receiver].message.to_list()
 
@@ -188,8 +216,6 @@ def get_messages_table():
 
 
 
-
-
 def send_message(sender, receiver, message, time):
 
     # TODO: error of some sort
@@ -209,10 +235,6 @@ def send_message(sender, receiver, message, time):
     return True
 
 
-
-
-
-
 def store_passwords_table(df):
     """
     Store the passwords table.
@@ -221,13 +243,8 @@ def store_passwords_table(df):
     df.to_csv(PASSWORDS_TABLE_PATH, index=False)
 
 
-
 def store_messages_table(df):
     df.to_csv(MESSAGES_TABLE_PATH, index=False)
-
-
-
-
 
 
 def user_exists(username):
@@ -242,7 +259,6 @@ def user_exists(username):
 def hash_password(password):
     h = hashlib.sha1(password.encode("utf-8")).hexdigest()
     return h
-
 
 
 
@@ -261,12 +277,15 @@ def session_expired(username):
 
 
 
-
 def generate_session_id():
     return random.randint(0 , 1000000000)
 
 
 def set_session_id(username, new_session_id):
+
+    """
+    Sets a user's new session id.
+    """
 
     df = get_passwords_table()
     df.loc[df.username == username, 'session_id'] = new_session_id
@@ -275,6 +294,10 @@ def set_session_id(username, new_session_id):
 
 
 def get_session_id(username):
+    """
+    Get a user's current session id.
+    """
+
     df = get_passwords_table()
     return df.loc[df.username == username, 'session_id'].to_list()[0]
 
